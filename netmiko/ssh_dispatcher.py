@@ -56,6 +56,7 @@ from netmiko.terminal_server import TerminalServerSSH
 from netmiko.terminal_server import TerminalServerTelnet
 from netmiko.ubiquiti import UbiquitiEdgeSSH
 from netmiko.vyos import VyOSSSH
+from netmiko.snr import SNRSSH, SNRNosTelnet, SNRNosSerial
 
 
 # The keys of this dictionary are the supported device_types
@@ -117,6 +118,7 @@ CLASS_MAPPER_BASE = {
     'ubiquiti_edgeswitch': UbiquitiEdgeSSH,
     'vyatta_vyos': VyOSSSH,
     'vyos': VyOSSSH,
+    'snr_nos': SNRSSH,
 }
 
 FILE_TRANSFER_MAP = {
@@ -160,9 +162,11 @@ CLASS_MAPPER['dell_powerconnect_telnet'] = DellPowerConnectTelnet
 CLASS_MAPPER['generic_termserver_telnet'] = TerminalServerTelnet
 CLASS_MAPPER['extreme_telnet'] = ExtremeTelnet
 CLASS_MAPPER['ruckus_fastiron_telnet'] = RuckusFastironTelnet
+CLASS_MAPPER['snr_nos_telnet'] = SNRNosTelnet
 
 # Add serial drivers
 CLASS_MAPPER['cisco_ios_serial'] = CiscoIosSerial
+CLASS_MAPPER['snr_nos_serial'] = SNRNosSerial
 
 # Add general terminal_server driver and autodetect
 CLASS_MAPPER['terminal_server'] = TerminalServerSSH

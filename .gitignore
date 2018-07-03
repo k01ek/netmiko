@@ -22,3 +22,6 @@ docs/build/doctrees/
 
 # Tox
 .tox/*
+
+# PyCharm
+.idea
