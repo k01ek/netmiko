@@ -170,7 +170,7 @@ def check_serial_port(name):
     """returns valid COM Port."""
     try:
         cdc = next(serial.tools.list_ports.grep(name))
-        return cdc.split()[0]
+        return cdc.__str__().split()[0]
     except StopIteration:
         msg = "device {} not found. ".format(name)
         msg += "available devices are: "
