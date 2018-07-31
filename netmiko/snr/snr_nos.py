@@ -1,11 +1,36 @@
 from netmiko.cisco_base_connection import CiscoSSHConnection
+from netmiko import log
+from netmiko.netmiko_globals import MAX_BUFFER
 
 import re
 import time
 
 
 class SNRSSH(CiscoSSHConnection):
-    pass
+    def session_preparation(self):
+        """
+        Prepare the session after the connection has been established
+
+        This method handles some differences that occur between various devices
+        early on in the session.
+
+        In general, it should include:
+        self._test_channel_read()
+        self.set_base_prompt()
+        self.disable_paging()
+        self.set_terminal_width()
+        self.clear_buffer()
+        """
+        self._test_channel_read()
+        self.set_base_prompt()
+        self.enable()
+        self.disable_paging()
+        self.exit_enable_mode()
+        self.set_terminal_width()
+
+        # Clear the read buffer
+        time.sleep(.3 * self.global_delay_factor)
+        self.clear_buffer()
 
 
 class SNRNosTelnet(SNRSSH):
@@ -41,3 +66,23 @@ class SNRNosSerial(SNRSSH):
             i += 1
         return self.telnet_login(pri_prompt_terminator, alt_prompt_terminator,
                                      username_pattern, pwd_pattern, delay_factor, max_loops)
+
+    def _read_channel(self):
+        output = ""
+        if self.protocol == 'ssh':
+            while True:
+                if self.remote_conn.recv_ready():
+                    outbuf = self.remote_conn.recv(MAX_BUFFER)
+                    if len(outbuf) == 0:
+                        raise EOFError("Channel stream closed by remote device.")
+                    output += outbuf.decode('utf-8', 'ignore')
+                else:
+                    break
+        elif self.protocol == 'telnet':
+            output = self.remote_conn.read_very_eager().decode('utf-8', 'ignore')
+        elif self.protocol == 'serial':
+            output = ""
+            while (self.remote_conn.in_waiting > 0):
+                output += self.remote_conn.read(self.remote_conn.in_waiting).decode('utf-8', 'ignore')
+        log.debug("read_channel: {}".format(output))
+        return output
